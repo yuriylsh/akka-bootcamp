@@ -12,15 +12,22 @@ namespace WinTail
 
         protected override void OnReceive(object message)
         {
-            var read = Console.ReadLine();
-            if (ExitCommand.Equals(read, StringComparison.OrdinalIgnoreCase))
+            switch (Console.ReadLine())
             {
-                Context.System.Terminate();
-                return;
+                case string s when ExitCommand.Equals(s, StringComparison.OrdinalIgnoreCase):
+                    Exit();
+                    break;
+                case string read:
+                    SendMessageToWriter(read);
+                    ContinueLoop();
+                    break;
             }
-            _writerActor.Tell(read);
-            Self.Tell(
-                "Send a message to itself after sending a message to ConsoleWriterActor. This is what keeps the read loop going.");
         }
+
+        private static void Exit() => Context.System.Terminate();
+
+        private void SendMessageToWriter(string message) => _writerActor.Tell(message);
+
+        private void ContinueLoop() => Self.Tell("Send a message to itself. This is what keeps the read loop going.");
     }
 }
