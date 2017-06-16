@@ -1,7 +1,19 @@
 ﻿namespace WinTail
 {
-    public class Messages
+    public static class Messages
     {
+        public static readonly Error.NullInputError NoInputMessage =
+            new Error.NullInputError("No input received.");
+
+        public static readonly Success.InputSuccess InputSuccessMessage = 
+            new Success.InputSuccess("Thank you! Message was valid.");
+
+        public static readonly Error.ValidationError ValidationErrorMessage = 
+            new Error.ValidationError("Invalid: input had odd number of characters.");
+
+        public static readonly Neutral.ContinueProcessing ContinueProcessingMessage = 
+            new Neutral.ContinueProcessing();
+
         public class Neutral
         {
             public class ContinueProcessing{}

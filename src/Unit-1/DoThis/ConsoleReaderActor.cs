@@ -1,13 +1,16 @@
 using System;
 using Akka.Actor;
 using static System.Console;
+using static WinTail.Messages;
 
 namespace WinTail
 {
     internal class ConsoleReaderActor : UntypedActor
     {
         public const string ExitCommand = "exit";
+
         public const string StartCommand = "start";
+
         private readonly IActorRef _writerActor;
 
         public ConsoleReaderActor(IActorRef writerActor) => _writerActor = writerActor;
@@ -19,7 +22,7 @@ namespace WinTail
                 case StartCommand:
                     ConsoleWriter.PrintInstructions();
                     break;
-                case Messages.Error.InputError error:
+                case Error.InputError error:
                     SendMessageToWriter(error);
                     break;
             }
@@ -33,17 +36,17 @@ namespace WinTail
             switch (ReadLine())
             {
                     case string s when string.IsNullOrEmpty(s):
-                        Self.Tell(new Messages.Error.NullInputError("No input received."));
+                        Self.Tell(NoInputMessage);
                         break;
                     case string s when ExitCommand.Equals(s, StringComparison.OrdinalIgnoreCase):
                         Context.System.Terminate();
                         break;
                     case string s when IsValid(s):
-                        SendMessageToWriter(new Messages.Success.InputSuccess("Thank you! Message was valid."));
-                        Self.Tell(new Messages.Neutral.ContinueProcessing());
+                        SendMessageToWriter(InputSuccessMessage);
+                        Self.Tell(ContinueProcessingMessage);
                         break;
                     default:
-                        Self.Tell(new Messages.Error.ValidationError("Invalid: input had odd number of characters."));
+                        Self.Tell(ValidationErrorMessage);
                         break;
             }
         }
