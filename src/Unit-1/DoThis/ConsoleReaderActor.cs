@@ -1,7 +1,6 @@
 using System;
 using Akka.Actor;
 using static System.Console;
-using static WinTail.Messages;
 
 namespace WinTail
 {
@@ -11,46 +10,30 @@ namespace WinTail
 
         public const string StartCommand = "start";
 
-        private readonly IActorRef _writerActor;
+        private readonly IActorRef _validationActor;
 
-        public ConsoleReaderActor(IActorRef writerActor) => _writerActor = writerActor;
+        public ConsoleReaderActor(IActorRef validationActor) => _validationActor = validationActor;
 
         protected override void OnReceive(object message)
         {
-            switch (message)
+            if (message.Equals(StartCommand))
             {
-                case StartCommand:
-                    ConsoleWriter.PrintInstructions();
-                    break;
-                case Error.InputError error:
-                    SendMessageToWriter(error);
-                    break;
+                ConsoleWriter.PrintInstructions();
             }
             GetAndValidateInput();
         }
-
-        private void SendMessageToWriter(object message) => _writerActor.Tell(message);
         
         private void GetAndValidateInput()
         {
-            switch (ReadLine())
+            var message = ReadLine();
+            if (string.Equals(message, ExitCommand, StringComparison.OrdinalIgnoreCase))
             {
-                    case string s when string.IsNullOrEmpty(s):
-                        Self.Tell(NoInputMessage);
-                        break;
-                    case string s when ExitCommand.Equals(s, StringComparison.OrdinalIgnoreCase):
-                        Context.System.Terminate();
-                        break;
-                    case string s when IsValid(s):
-                        SendMessageToWriter(InputSuccessMessage);
-                        Self.Tell(ContinueProcessingMessage);
-                        break;
-                    default:
-                        Self.Tell(ValidationErrorMessage);
-                        break;
+                Context.System.Terminate();
+            }
+            else
+            {
+                _validationActor.Tell(message);
             }
         }
-
-        private static bool IsValid(string message) => message.Length % 2 == 0;
     }
 }
