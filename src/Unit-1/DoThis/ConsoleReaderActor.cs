@@ -10,9 +10,9 @@ namespace WinTail
 
         public const string StartCommand = "start";
 
-        private readonly IActorRef _validationActor;
+        private readonly ActorSelection _validationActor;
 
-        public ConsoleReaderActor(IActorRef validationActor) => _validationActor = validationActor;
+        public ConsoleReaderActor() => _validationActor = Context.ActorSelection(Names.TopLevelActorPath(Names.ValidatorActor));
 
         protected override void OnReceive(object message)
         {

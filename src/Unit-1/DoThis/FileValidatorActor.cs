@@ -7,12 +7,12 @@ namespace WinTail
     public class FileValidatorActor: UntypedActor
     {
         private readonly IActorRef _writerActor;
-        private readonly IActorRef _tailCoordinatorActor;
+        private readonly ActorSelection _tailCoordinatorActor;
 
-        public FileValidatorActor(IActorRef writerActor, IActorRef tailCoordinatorActor)
+        public FileValidatorActor(IActorRef writerActor)
         {
             _writerActor = writerActor;
-            _tailCoordinatorActor = tailCoordinatorActor;
+            _tailCoordinatorActor = Context.ActorSelection(Names.TopLevelActorPath(Names.TailCoordinatorActor));
         }
 
         protected override void OnReceive(object message)

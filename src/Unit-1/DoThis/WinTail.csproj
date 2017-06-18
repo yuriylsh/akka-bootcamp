@@ -48,6 +48,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Names.cs" />
     <Compile Include="ConsoleReaderActor.cs" />
     <Compile Include="ConsoleWriter.cs" />
     <Compile Include="ConsoleWriterActor.cs" />
