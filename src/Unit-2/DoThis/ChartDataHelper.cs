@@ -5,9 +5,6 @@ using Akka.Util;
 
 namespace ChartApp
 {
-    /// <summary>
-    /// Helper class for creating random data for chart plots
-    /// </summary>
     public static class ChartDataHelper
     {
         public static Series RandomSeries(string seriesName, SeriesChartType type = SeriesChartType.Line, int points = 100)
