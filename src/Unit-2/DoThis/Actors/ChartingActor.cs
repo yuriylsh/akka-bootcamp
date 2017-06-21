@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms.DataVisualization.Charting;
 using Akka.Actor;
 
@@ -8,19 +9,19 @@ namespace ChartApp.Actors
     {
         public class InitializeChart
         {
-            public InitializeChart(Dictionary<string, Series> initialSeries) => InitialSeries = initialSeries;
+            public InitializeChart(ICollection<Series> initialSeries) => InitialSeries = initialSeries;
 
-            public Dictionary<string, Series> InitialSeries { get; }
+            public ICollection<Series> InitialSeries { get; }
         }
 
         private readonly Chart _chart;
-        private Dictionary<string, Series> _seriesIndex;
+        private ICollection<Series> _seriesIndex;
 
-        public ChartingActor(Chart chart) : this(chart, new Dictionary<string, Series>())
+        public ChartingActor(Chart chart) : this(chart, Array.Empty<Series>())
         {
         }
 
-        private ChartingActor(Chart chart, Dictionary<string, Series> seriesIndex)
+        private ChartingActor(Chart chart, ICollection<Series> seriesIndex)
         {
             _chart = chart;
             _seriesIndex = seriesIndex;
@@ -49,8 +50,7 @@ namespace ChartApp.Actors
             foreach (var series in _seriesIndex)
             {
                 //force both the chart and the internal index to use the same names
-                series.Value.Name = series.Key;
-                _chart.Series.Add(series.Value);
+                _chart.Series.Add(series);
             }
         }
     }
