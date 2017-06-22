@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using Akka.Actor;
 using Akka.Util.Internal;
 using ChartApp.Actors;
@@ -19,8 +20,7 @@ namespace ChartApp
         private void Main_Load(object sender, EventArgs e)
         {
             _chartActor = Program.ChartActors.ActorOf(Props.Create<ChartingActor>(sysChart), Names.ChartinActorName);
-            var series = ChartDataHelper.RandomSeries("FakeSeries" + _seriesCounter.GetAndIncrement());
-            _chartActor.Tell(new ChartingActor.InitializeChart(new []{ series }));
+            _chartActor.Tell(new ChartingActor.InitializeChart(new []{ CreateNewRandomSeries() }));
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
@@ -31,5 +31,17 @@ namespace ChartApp
             //shut down the ActorSystem
             Program.ChartActors.Terminate();
         }
+
+        private void addSeriesButton_Click(object sender, EventArgs e) 
+            => _chartActor.Tell(new ChartingActor.AddSeries(CreateNewRandomSeries()));
+
+        private void AddNewRandomSeries()
+            => _chartActor.Tell(new ChartingActor.AddSeries(CreateNewRandomSeries()));
+
+        private Series CreateNewRandomSeries() => ChartDataHelper.RandomSeries(CreateNewSeriesName());
+        
+        private string CreateNewSeriesName() => "FakeSeries" + _seriesCounter.GetAndIncrement();
+
+
     }
 }

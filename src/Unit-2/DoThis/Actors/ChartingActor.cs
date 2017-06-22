@@ -5,17 +5,13 @@ using Akka.Actor;
 
 namespace ChartApp.Actors
 {
-    public class ChartingActor : UntypedActor
+    public class ChartingActor : ReceiveActor
     {
-        public class InitializeChart
-        {
-            public InitializeChart(ICollection<Series> initialSeries) => InitialSeries = initialSeries;
-
-            public ICollection<Series> InitialSeries { get; }
-        }
-
         private readonly Chart _chart;
-        private ICollection<Series> _seriesIndex;
+
+        private static readonly SeriesByNameComparer seriesComparer = new SeriesByNameComparer();
+
+        private readonly HashSet<Series> _seriesIndex = new HashSet<Series>(seriesComparer);
 
         public ChartingActor(Chart chart) : this(chart, Array.Empty<Series>())
         {
@@ -24,15 +20,10 @@ namespace ChartApp.Actors
         private ChartingActor(Chart chart, ICollection<Series> seriesIndex)
         {
             _chart = chart;
-            _seriesIndex = seriesIndex;
-        }
+            SetSeries(seriesIndex);
 
-        protected override void OnReceive(object message)
-        {
-            if (message is InitializeChart ic)
-            {
-                HandleInitialize(ic);
-            }
+            Receive<InitializeChart>(ic => HandleInitialize(ic));
+            Receive<AddSeries>(addSeries => HandleAddSeries(addSeries));
         }
 
         private void HandleInitialize(InitializeChart initializeChart)
@@ -40,7 +31,7 @@ namespace ChartApp.Actors
             if (initializeChart.InitialSeries != null)
             {
                 //swap the two series out
-                _seriesIndex = initializeChart.InitialSeries;
+               SetSeries(initializeChart.InitialSeries);
             }
 
             //delete any existing series
@@ -52,6 +43,49 @@ namespace ChartApp.Actors
                 //force both the chart and the internal index to use the same names
                 _chart.Series.Add(series);
             }
+        }
+
+        private void HandleAddSeries(AddSeries series)
+        {
+            var seriesToAdd = series.Series;
+            if(!string.IsNullOrEmpty(seriesToAdd.Name) && !_seriesIndex.Contains(seriesToAdd))
+            {
+                _seriesIndex.Add(seriesToAdd);
+                _chart.Series.Add(seriesToAdd);
+            }
+        }
+
+        private void SetSeries(ICollection<Series> series)
+        {
+            _seriesIndex.Clear();
+            foreach (var s in series)
+            {
+                _seriesIndex.Add(s);
+            }
+        }
+
+        public class InitializeChart
+        {
+            public InitializeChart(ICollection<Series> initialSeries) => InitialSeries = initialSeries;
+
+            public ICollection<Series> InitialSeries { get; }
+        }
+
+        public class AddSeries
+        {
+            public Series Series { get; }
+
+            public AddSeries(Series series)
+            {
+                Series = series;
+            }
+        }
+
+        private class SeriesByNameComparer : IEqualityComparer<Series>
+        {
+            public bool Equals(Series x, Series y) => x.Name.Equals(y.Name, StringComparison.OrdinalIgnoreCase);
+
+            public int GetHashCode(Series series) => series.Name.GetHashCode();
         }
     }
 }
