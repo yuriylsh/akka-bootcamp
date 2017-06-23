@@ -69,5 +69,10 @@ namespace ChartApp
         {
             _toggleActors[CounterType.Disk].Tell(ToggleButtonMessage);
         }
+
+        private void btnPauseResume_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
