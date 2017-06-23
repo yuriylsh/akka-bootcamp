@@ -5,12 +5,13 @@ using Akka.Actor;
 
 namespace ChartApp.Actors
 {
-    public class ChartingActor : ReceiveActor
+    public class ChartingActor : ReceiveActor, IWithUnboundedStash
     {
-        
         private readonly ChartingHelper _chart;
 
         private readonly Action<string> _pauseButtonTextSetter;
+
+        public IStash Stash { get; set; }
 
         public ChartingActor(Chart chart, Action<string> textSetter) : this(chart, Array.Empty<Series>(), textSetter)
         {
@@ -30,8 +31,6 @@ namespace ChartApp.Actors
             Receive<AddSeries>(addSeries => HandleAddSeries(addSeries));
             Receive<RemoveSeries>(removeSeries => HandleRemoveSeries(removeSeries));
             Receive<Metric>(metric => HandleMetrics(metric));
-
-            //new receive handler for the TogglePause message type
             Receive<TogglePause>(pause =>
             {
                 SetPauseButtonText(true);
@@ -41,11 +40,14 @@ namespace ChartApp.Actors
 
         private void Paused()
         {
+            Receive<AddSeries>(addSeries => Stash.Stash());
+            Receive<RemoveSeries>(removeSeries => Stash.Stash());
             Receive<Metric>(metric => HandleMetricsPaused(metric));
             Receive<TogglePause>(pause =>
             {
                 SetPauseButtonText(false);
                 UnbecomeStacked();
+                Stash.UnstashAll();
             });
         }
 
