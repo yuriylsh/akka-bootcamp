@@ -1,4 +1,4 @@
-﻿using System.Windows.Forms;
+﻿using System;
 using Akka.Actor;
 
 namespace ChartApp.Actors
@@ -7,14 +7,14 @@ namespace ChartApp.Actors
     {
         private readonly CounterType _myCounterType;
         private bool _isToggledOn;
-        private readonly Button _myButton;
         private readonly IActorRef _coordinatorActor;
+        private readonly Action<string> _buttonTextSetter;
         private readonly string _myCounterTypeName;
 
-        public ButtonToggleActor(IActorRef coordinatorActor, Button myButton, CounterType myCounterType, bool isToggledOn = false)
+        public ButtonToggleActor(IActorRef coordinatorActor, Action<string> buttonTextSetter, CounterType myCounterType, bool isToggledOn = false)
         {
             _coordinatorActor = coordinatorActor;
-            _myButton = myButton;
+            _buttonTextSetter = buttonTextSetter;
             _isToggledOn = isToggledOn;
             _myCounterType = myCounterType;
             _myCounterTypeName = _myCounterType.ToString().ToUpperInvariant();
@@ -41,7 +41,7 @@ namespace ChartApp.Actors
         private void FlipToggle()
         {
             _isToggledOn = !_isToggledOn;
-            _myButton.Text = string.Concat(_myCounterTypeName, " (", _isToggledOn ? "ON" : "OFF", ")");
+            _buttonTextSetter(string.Concat(_myCounterTypeName, " (", _isToggledOn ? "ON" : "OFF", ")"));
         }
 
         public class Toggle { }

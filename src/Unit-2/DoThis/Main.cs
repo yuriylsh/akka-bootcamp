@@ -23,7 +23,9 @@ namespace ChartApp
 
         private void Main_Load(object sender, EventArgs e)
         {
-            _chartActor = Program.ChartActors.ActorOf(Props.Create(() => new ChartingActor(sysChart)), Names.ChartinActorName);
+            _chartActor = Program.ChartActors.ActorOf(Props.Create(
+                () => new ChartingActor(sysChart, CreateControlTextSetter(btnPauseResume))), 
+                Names.ChartinActorName);
             _chartActor.Tell(new ChartingActor.InitializeChart(null)); 
 
             _coordinatorActor = Program.ChartActors.ActorOf(Props.Create(() =>
@@ -43,8 +45,11 @@ namespace ChartApp
         }
 
         private Props CreateButtonToggleProps(Button button, CounterType counterType) 
-            => Props.Create(() => new ButtonToggleActor(_coordinatorActor, button, counterType, false))
+            => Props.Create(() => new ButtonToggleActor(_coordinatorActor, CreateControlTextSetter(button), counterType, false))
                 .WithDispatcher("akka.actor.synchronized-dispatcher");
+
+        private Action<string> CreateControlTextSetter(Control button)
+            => newButtonText => button.Text = newButtonText;
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -72,7 +77,7 @@ namespace ChartApp
 
         private void btnPauseResume_Click(object sender, EventArgs e)
         {
-
+            _chartActor.Tell(new ChartingActor.TogglePause());
         }
     }
 }

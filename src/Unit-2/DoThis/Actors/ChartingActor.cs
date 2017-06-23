@@ -10,20 +10,48 @@ namespace ChartApp.Actors
         
         private readonly ChartingHelper _chart;
 
-        public ChartingActor(Chart chart) : this(chart, Array.Empty<Series>())
+        private readonly Action<string> _pauseButtonTextSetter;
+
+        public ChartingActor(Chart chart, Action<string> textSetter) : this(chart, Array.Empty<Series>(), textSetter)
         {
         }
 
-        private ChartingActor(Chart chart, IEnumerable<Series> seriesIndex)
+        private ChartingActor(Chart chart, IEnumerable<Series> seriesIndex, Action<string> pauseButtonTextSetter)
         {
             _chart = new ChartingHelper(chart);
             _chart.SetSeries(seriesIndex);
+            _pauseButtonTextSetter = pauseButtonTextSetter;
+            Charting();
+        }
 
+        private void Charting()
+        {
             Receive<InitializeChart>(ic => HandleInitialize(ic));
             Receive<AddSeries>(addSeries => HandleAddSeries(addSeries));
             Receive<RemoveSeries>(removeSeries => HandleRemoveSeries(removeSeries));
             Receive<Metric>(metric => HandleMetrics(metric));
+
+            //new receive handler for the TogglePause message type
+            Receive<TogglePause>(pause =>
+            {
+                SetPauseButtonText(true);
+                BecomeStacked(Paused);
+            });
         }
+
+        private void Paused()
+        {
+            Receive<Metric>(metric => HandleMetricsPaused(metric));
+            Receive<TogglePause>(pause =>
+            {
+                SetPauseButtonText(false);
+                UnbecomeStacked();
+            });
+        }
+
+        private void SetPauseButtonText(bool paused) => _pauseButtonTextSetter(!paused ? "PAUSE ||" : "RESUME ->");
+
+        private void HandleMetricsPaused(Metric metric) => _chart.AddPoint(0.0f, metric.Series);
 
         private void HandleInitialize(InitializeChart ic)
         {
@@ -39,7 +67,6 @@ namespace ChartApp.Actors
         private void HandleRemoveSeries(RemoveSeries series) => _chart.RemoveSeries(series.SeriesName);
 
         private void HandleMetrics(Metric metric) => _chart.AddPoint(metric.CounterValue, metric.Series);
-       
         
         public class InitializeChart
         {
@@ -64,5 +91,7 @@ namespace ChartApp.Actors
 
             public RemoveSeries(string seriesName) => SeriesName = seriesName;
         }
+
+        public class TogglePause { }
     }
 }
