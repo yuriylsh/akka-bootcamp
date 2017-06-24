@@ -1,11 +1,5 @@
-﻿using Akka.Actor;
-
-namespace GithubActors
+﻿namespace GithubActors
 {
-    /// <summary>
-    /// Static helper class used to define paths to fixed-name actors
-    /// (helps eliminate errors when using <see cref="ActorSelection"/>)
-    /// </summary>
     public static class ActorPaths
     {
 		public static readonly ActorMetaData GithubAuthenticatorActor = new ActorMetaData("authenticator", "akka://GithubActors/user/authenticator");
@@ -15,9 +9,6 @@ namespace GithubActors
 		public static readonly ActorMetaData GithubCoordinatorActor = new ActorMetaData("coordinator", "akka://GithubActors/user/commander/coordinator");
     }
 
-    /// <summary>
-    /// Meta-data class
-    /// </summary>
     public class ActorMetaData
     {
         public ActorMetaData(string name, string path)

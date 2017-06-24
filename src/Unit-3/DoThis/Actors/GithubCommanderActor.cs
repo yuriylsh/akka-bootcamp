@@ -8,35 +8,7 @@ namespace GithubActors.Actors
     /// </summary>
     public class GithubCommanderActor : ReceiveActor
     {
-        public class CanAcceptJob
-        {
-            public CanAcceptJob(RepoKey repo)
-            {
-                Repo = repo;
-            }
-
-            public RepoKey Repo { get; }
-        }
-
-        public class AbleToAcceptJob
-        {
-            public AbleToAcceptJob(RepoKey repo)
-            {
-                Repo = repo;
-            }
-
-            public RepoKey Repo { get; }
-        }
-
-        public class UnableToAcceptJob
-        {
-            public UnableToAcceptJob(RepoKey repo)
-            {
-                Repo = repo;
-            }
-
-            public RepoKey Repo { get; }
-        }
+        
 
         private IActorRef _coordinator;
         private IActorRef _canAcceptJobSender;
@@ -77,6 +49,32 @@ namespace GithubActors.Actors
             //kill off the old coordinator so we can recreate it from scratch
             _coordinator.Tell(PoisonPill.Instance);
             base.PreRestart(reason, message);
+        }
+
+
+        public abstract class Job
+        {
+            public RepoKey Repo { get; }
+
+            protected Job(RepoKey repo)
+            {
+                Repo = repo;
+            }
+        }
+
+        public class CanAcceptJob : Job
+        {
+            public CanAcceptJob(RepoKey repo): base(repo){}
+        }
+
+        public class AbleToAcceptJob: Job
+        {
+            public AbleToAcceptJob(RepoKey repo): base(repo){}
+        }
+
+        public class UnableToAcceptJob: Job
+        {
+            public UnableToAcceptJob(RepoKey repo): base(repo){}
         }
     }
 }

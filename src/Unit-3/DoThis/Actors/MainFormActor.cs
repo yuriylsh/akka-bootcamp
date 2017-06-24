@@ -10,19 +10,6 @@ namespace GithubActors.Actors
     /// </summary>
     public class MainFormActor : ReceiveActor, IWithUnboundedStash
     {
-        public class LaunchRepoResultsWindow
-        {
-            public LaunchRepoResultsWindow(RepoKey repo, IActorRef coordinator)
-            {
-                Repo = repo;
-                Coordinator = coordinator;
-            }
-
-            public RepoKey Repo { get; }
-
-            public IActorRef Coordinator { get; }
-        }
-
         private readonly Label _validationLabel;
 
         public MainFormActor(Label validationLabel)
@@ -69,12 +56,16 @@ namespace GithubActors.Actors
             Receive<GithubValidatorActor.RepoIsValid>(valid => BecomeReady("Valid!"));
             Receive<GithubValidatorActor.InvalidRepo>(invalid => BecomeReady(invalid.Reason, false));
             //yes
-            Receive<GithubCommanderActor.UnableToAcceptJob>(job => BecomeReady(string.Format("{0}/{1} is a valid repo, but system can't accept additional jobs", job.Repo.Owner, job.Repo.Repo), false));
+            Receive<GithubCommanderActor.UnableToAcceptJob>(job => BecomeReady(
+                GetRepoLabel(job) + " is a valid repo, but system can't accept additional jobs", false));
 
             //no
-            Receive<GithubCommanderActor.AbleToAcceptJob>(job => BecomeReady(string.Format("{0}/{1} is a valid repo - starting job!", job.Repo.Owner, job.Repo.Repo)));
+            Receive<GithubCommanderActor.AbleToAcceptJob>(job => BecomeReady(
+                GetRepoLabel(job) + " is a valid repo - starting job!"));
             Receive<LaunchRepoResultsWindow>(window => Stash.Stash());
         }
+
+        private static string GetRepoLabel(GithubCommanderActor.Job job) => string.Concat(job.Repo.Owner, "/", job.Repo.Repo);
 
         private void BecomeReady(string message, bool isValid = true)
         {
@@ -85,5 +76,18 @@ namespace GithubActors.Actors
         }
 
         public IStash Stash { get; set; }
+
+        public class LaunchRepoResultsWindow
+        {
+            public LaunchRepoResultsWindow(RepoKey repo, IActorRef coordinator)
+            {
+                Repo = repo;
+                Coordinator = coordinator;
+            }
+
+            public RepoKey Repo { get; }
+
+            public IActorRef Coordinator { get; }
+        }
     }
 }

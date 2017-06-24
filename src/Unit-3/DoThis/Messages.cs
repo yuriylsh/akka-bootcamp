@@ -2,30 +2,37 @@
 {
     public class ProcessRepo
     {
-        public ProcessRepo(string repoUri)
-        {
-            RepoUri = repoUri;
-        }
-
         public string RepoUri { get; }
+
+        public ProcessRepo(string repoUri) => RepoUri = repoUri;
     }
 
     public class RepoKey
     {
+        public string Owner { get; }
+
+        public string Repo { get; }
+
         public RepoKey(string owner, string repo)
         {
             Repo = repo;
             Owner = owner;
         }
-
-        public string Owner { get; }
-
-        public string Repo { get; }
     }
 
 
     public class RetryableQuery
     {
+        public object Query { get; }
+
+        public int AllowableTries { get; }
+
+        public int CurrentAttempt { get; }
+
+        public bool CanRetry => RemainingTries > 0;
+
+        public int RemainingTries => AllowableTries - CurrentAttempt;
+
         public RetryableQuery(object query, int allowableTries) : this(query, allowableTries, 0)
         {
         }
@@ -37,19 +44,6 @@
             CurrentAttempt = currentAttempt;
         }
 
-
-        public object Query { get; }
-
-        public int AllowableTries { get; }
-
-        public int CurrentAttempt { get; }
-
-        public bool CanRetry => RemainingTries > 0;
-        public int RemainingTries => AllowableTries - CurrentAttempt;
-
-        public RetryableQuery NextTry()
-        {
-            return new RetryableQuery(Query, AllowableTries, CurrentAttempt+1);
-        }
+        public RetryableQuery NextTry() => new RetryableQuery(Query, AllowableTries, CurrentAttempt+1);
     }
 }
