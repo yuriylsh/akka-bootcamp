@@ -1,8 +1,5 @@
 ﻿namespace GithubActors
 {
-    /// <summary>
-    /// Begin processing a new Github repository for analysis
-    /// </summary>
     public class ProcessRepo
     {
         public ProcessRepo(string repoUri)
@@ -47,8 +44,8 @@
 
         public int CurrentAttempt { get; }
 
-        public bool CanRetry { get { return RemainingTries > 0; } }
-        public int RemainingTries { get { return AllowableTries - CurrentAttempt; } }
+        public bool CanRetry => RemainingTries > 0;
+        public int RemainingTries => AllowableTries - CurrentAttempt;
 
         public RetryableQuery NextTry()
         {

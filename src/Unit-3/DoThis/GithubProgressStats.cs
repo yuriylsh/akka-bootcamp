@@ -4,27 +4,7 @@ using Octokit;
 namespace GithubActors
 {
     /// <summary>
-    /// used to sort the list of similar repos
-    /// </summary>
-    public class SimilarRepo : IComparable<SimilarRepo>
-    {
-        public SimilarRepo(Repository repo)
-        {
-            Repo = repo;
-        }
-
-        public Repository Repo { get; }
-
-        public int SharedStarrers { get; set; }
-        public int CompareTo(SimilarRepo other)
-        {
-            return SharedStarrers.CompareTo(other.SharedStarrers);
-        }
-    }
-
-    /// <summary>
     /// Used to report on incremental progress.
-    /// 
     /// Immutable.
     /// </summary>
     public class GithubProgressStats
@@ -35,18 +15,9 @@ namespace GithubActors
         public DateTime StartTime { get; }
         public DateTime? EndTime { get; }
 
-        public TimeSpan Elapsed
-        {
-            get
-            {
-                return ((EndTime.HasValue ? EndTime.Value : DateTime.UtcNow) -StartTime);
-            }
-        }
+        public TimeSpan Elapsed => (EndTime ?? DateTime.UtcNow) -StartTime;
 
-        public bool IsFinished
-        {
-            get { return ExpectedUsers == UsersThusFar + QueryFailures; }
-        }
+        public bool IsFinished => ExpectedUsers == UsersThusFar + QueryFailures;
 
         public GithubProgressStats()
         {
@@ -102,6 +73,23 @@ namespace GithubActors
         {
             return new GithubProgressStats(startTime ?? StartTime, expectedUsers ?? ExpectedUsers, usersThusFar ?? UsersThusFar,
                 queryFailures ?? QueryFailures, endTime ?? EndTime);
+        }
+    }
+
+    public class SimilarRepo : IComparable<SimilarRepo>
+    {
+        public SimilarRepo(Repository repo)
+        {
+            Repo = repo;
+        }
+
+        public Repository Repo { get; }
+
+        public int SharedStarrers { get; set; }
+
+        public int CompareTo(SimilarRepo other)
+        {
+            return SharedStarrers.CompareTo(other.SharedStarrers);
         }
     }
 }

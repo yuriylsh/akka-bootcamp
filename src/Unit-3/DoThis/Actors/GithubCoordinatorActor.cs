@@ -37,10 +37,7 @@ namespace GithubActors.Actors
             private PublishUpdate() { }
             private static readonly PublishUpdate _instance = new PublishUpdate();
 
-            public static PublishUpdate Instance
-            {
-                get { return _instance; }
-            }
+            public static PublishUpdate Instance => _instance;
         }
 
         /// <summary>

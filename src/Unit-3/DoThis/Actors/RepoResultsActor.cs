@@ -11,15 +11,14 @@ namespace GithubActors.Actors
     /// </summary>
     public class RepoResultsActor : ReceiveActor
     {
-        private readonly DataGridView _userDg;
+        private readonly DataGridView _grid;
         private readonly ToolStripStatusLabel _statusLabel;
         private readonly ToolStripProgressBar _progressBar;
+        private readonly bool _hasSetProgress = false;
 
-        private bool _hasSetProgress = false;
-
-        public RepoResultsActor(DataGridView userDg, ToolStripStatusLabel statusLabel, ToolStripProgressBar progressBar)
+        public RepoResultsActor(DataGridView grid, ToolStripStatusLabel statusLabel, ToolStripProgressBar progressBar)
         {
-            _userDg = userDg;
+            _grid = grid;
             _statusLabel = statusLabel;
             _progressBar = progressBar;
             InitialReceives();
@@ -53,7 +52,7 @@ namespace GithubActors.Actors
                 {
                     var repo = similarRepo.Repo;
                     var row = new DataGridViewRow();
-                    row.CreateCells(_userDg);
+                    row.CreateCells(_grid);
                     row.Cells[0].Value = repo.Owner.Login;
                     row.Cells[1].Value = repo.Name;
                     row.Cells[2].Value = repo.HtmlUrl;
@@ -61,7 +60,7 @@ namespace GithubActors.Actors
                     row.Cells[4].Value = repo.OpenIssuesCount;
                     row.Cells[5].Value = repo.StargazersCount;
                     row.Cells[6].Value = repo.ForksCount;
-                    _userDg.Rows.Add(row);
+                    _grid.Rows.Add(row);
                 }
             });
 

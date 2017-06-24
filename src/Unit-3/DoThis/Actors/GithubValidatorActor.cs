@@ -51,7 +51,7 @@ namespace GithubActors.Actors
              */
             private RepoIsValid() { }
             private static readonly RepoIsValid _instance = new RepoIsValid();
-            public static RepoIsValid Instance { get { return _instance; } }
+            public static RepoIsValid Instance => _instance;
         }
 
         private readonly IGitHubClient _gitHubClient;
