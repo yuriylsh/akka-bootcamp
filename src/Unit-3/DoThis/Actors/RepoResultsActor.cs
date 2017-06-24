@@ -11,9 +11,9 @@ namespace GithubActors.Actors
     /// </summary>
     public class RepoResultsActor : ReceiveActor
     {
-        private DataGridView _userDg;
-        private ToolStripStatusLabel _statusLabel;
-        private ToolStripProgressBar _progressBar;
+        private readonly DataGridView _userDg;
+        private readonly ToolStripStatusLabel _statusLabel;
+        private readonly ToolStripProgressBar _progressBar;
 
         private bool _hasSetProgress = false;
 
@@ -41,8 +41,8 @@ namespace GithubActors.Actors
                     _statusLabel.Visible = true;
                 }
 
-                _statusLabel.Text = string.Format("{0} out of {1} users ({2} failures) [{3} elapsed]",
-                    stats.UsersThusFar, stats.ExpectedUsers, stats.QueryFailures, stats.Elapsed);
+                _statusLabel.Text =
+                    $"{stats.UsersThusFar} out of {stats.ExpectedUsers} users ({stats.QueryFailures} failures) [{stats.Elapsed} elapsed]";
                 _progressBar.Value = stats.UsersThusFar + stats.QueryFailures;
             });
 
@@ -73,8 +73,7 @@ namespace GithubActors.Actors
                 _progressBar.Maximum = 1;
                 _progressBar.Value = 1;
                 _statusLabel.Visible = true;
-                _statusLabel.Text = string.Format("Failed to gather data for Github repository {0} / {1}",
-                    failed.Repo.Owner, failed.Repo.Repo);
+                _statusLabel.Text = $"Failed to gather data for Github repository {failed.Repo.Owner} / {failed.Repo.Repo}";
             });
         }
     }

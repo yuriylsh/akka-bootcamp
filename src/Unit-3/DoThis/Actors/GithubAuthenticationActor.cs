@@ -7,8 +7,6 @@ namespace GithubActors.Actors
 {
     public class GithubAuthenticationActor : ReceiveActor
     {
-        #region Messages
-
         public class Authenticate
         {
             public Authenticate(string oAuthToken)
@@ -16,7 +14,7 @@ namespace GithubActors.Actors
                 OAuthToken = oAuthToken;
             }
 
-            public string OAuthToken { get; private set; }
+            public string OAuthToken { get; }
         }
 
         public class AuthenticationFailed { }
@@ -24,8 +22,6 @@ namespace GithubActors.Actors
         public class AuthenticationCancelled { }
 
         public class AuthenticationSuccess { }
-
-        #endregion
 
         private readonly Label _statusLabel;
         private readonly GithubAuth _form;
@@ -60,16 +56,21 @@ namespace GithubActors.Actors
         private void BecomeAuthenticating()
         {
             _statusLabel.Visible = true;
-            _statusLabel.ForeColor = Color.Yellow;
-            _statusLabel.Text = "Authenticating...";
+            SetStatusLabelText("Authenticating...", Color.Yellow);
+
             Become(Authenticating);
         }
 
         private void BecomeUnauthenticated(string reason)
         {
-            _statusLabel.ForeColor = Color.Red;
-            _statusLabel.Text = "Authentication failed. Please try again.";
+            SetStatusLabelText("Authentication failed. Please try again.", Color.Red);
             Become(Unauthenticated);
+        }
+
+        private void SetStatusLabelText(string text, Color color)
+        {
+            _statusLabel.ForeColor = color;
+            _statusLabel.Text = text;
         }
 
         private void Authenticating()

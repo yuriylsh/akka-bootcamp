@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using Akka.Actor;
-using Akka.Routing;
 
 namespace GithubActors.Actors
 {
@@ -10,8 +8,6 @@ namespace GithubActors.Actors
     /// </summary>
     public class GithubCommanderActor : ReceiveActor
     {
-        #region Message classes
-
         public class CanAcceptJob
         {
             public CanAcceptJob(RepoKey repo)
@@ -19,7 +15,7 @@ namespace GithubActors.Actors
                 Repo = repo;
             }
 
-            public RepoKey Repo { get; private set; }
+            public RepoKey Repo { get; }
         }
 
         public class AbleToAcceptJob
@@ -29,7 +25,7 @@ namespace GithubActors.Actors
                 Repo = repo;
             }
 
-            public RepoKey Repo { get; private set; }
+            public RepoKey Repo { get; }
         }
 
         public class UnableToAcceptJob
@@ -39,10 +35,8 @@ namespace GithubActors.Actors
                 Repo = repo;
             }
 
-            public RepoKey Repo { get; private set; }
+            public RepoKey Repo { get; }
         }
-
-        #endregion
 
         private IActorRef _coordinator;
         private IActorRef _canAcceptJobSender;

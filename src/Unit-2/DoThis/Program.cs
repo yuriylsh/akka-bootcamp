@@ -14,7 +14,7 @@ namespace ChartApp
         {
             ChartActors = ActorSystem.Create(SystemName);
             Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetCompatibleTextRenderingDefault(true);
             Application.Run(new Main());
         }
     }

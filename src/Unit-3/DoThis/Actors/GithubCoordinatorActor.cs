@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Akka.Actor;
-using Akka.Routing;
 using Octokit;
 
 namespace GithubActors.Actors
@@ -14,8 +12,6 @@ namespace GithubActors.Actors
     /// </summary>
     public class GithubCoordinatorActor : ReceiveActor
     {
-        #region Message classes
-
         public class BeginJob
         {
             public BeginJob(RepoKey repo)
@@ -23,7 +19,7 @@ namespace GithubActors.Actors
                 Repo = repo;
             }
 
-            public RepoKey Repo { get; private set; }
+            public RepoKey Repo { get; }
         }
 
         public class SubscribeToProgressUpdates
@@ -33,7 +29,7 @@ namespace GithubActors.Actors
                 Subscriber = subscriber;
             }
 
-            public IActorRef Subscriber { get; private set; }
+            public IActorRef Subscriber { get; }
         }
 
         public class PublishUpdate
@@ -57,10 +53,8 @@ namespace GithubActors.Actors
                 Repo = repo;
             }
 
-            public RepoKey Repo { get; private set; }
+            public RepoKey Repo { get; }
         }
-
-        #endregion
 
         private IActorRef _githubWorker;
 

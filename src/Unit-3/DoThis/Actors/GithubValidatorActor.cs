@@ -10,8 +10,6 @@ namespace GithubActors.Actors
     /// </summary>
     public class GithubValidatorActor : ReceiveActor
     {
-        #region Messages
-
         public class ValidateRepo
         {
             public ValidateRepo(string repoUri)
@@ -19,7 +17,7 @@ namespace GithubActors.Actors
                 RepoUri = repoUri;
             }
 
-            public string RepoUri { get; private set; }
+            public string RepoUri { get; }
         }
 
         public class InvalidRepo
@@ -30,9 +28,9 @@ namespace GithubActors.Actors
                 RepoUri = repoUri;
             }
 
-            public string RepoUri { get; private set; }
+            public string RepoUri { get; }
 
-            public string Reason { get; private set; }
+            public string Reason { get; }
         }
 
         /// <summary>
@@ -55,8 +53,6 @@ namespace GithubActors.Actors
             private static readonly RepoIsValid _instance = new RepoIsValid();
             public static RepoIsValid Instance { get { return _instance; } }
         }
-
-        #endregion
 
         private readonly IGitHubClient _gitHubClient;
 

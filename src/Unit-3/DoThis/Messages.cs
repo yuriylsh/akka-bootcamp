@@ -10,7 +10,7 @@
             RepoUri = repoUri;
         }
 
-        public string RepoUri { get; private set; }
+        public string RepoUri { get; }
     }
 
     public class RepoKey
@@ -21,9 +21,9 @@
             Owner = owner;
         }
 
-        public string Owner { get; private set; }
+        public string Owner { get; }
 
-        public string Repo { get; private set; }
+        public string Repo { get; }
     }
 
 
@@ -41,11 +41,11 @@
         }
 
 
-        public object Query { get; private set; }
+        public object Query { get; }
 
-        public int AllowableTries { get; private set; }
+        public int AllowableTries { get; }
 
-        public int CurrentAttempt { get; private set; }
+        public int CurrentAttempt { get; }
 
         public bool CanRetry { get { return RemainingTries > 0; } }
         public int RemainingTries { get { return AllowableTries - CurrentAttempt; } }

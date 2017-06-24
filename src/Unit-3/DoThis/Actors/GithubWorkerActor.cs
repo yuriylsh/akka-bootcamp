@@ -11,8 +11,6 @@ namespace GithubActors.Actors
     /// </summary>
     public class GithubWorkerActor : ReceiveActor
     {
-        #region Message classes
-
         public class QueryStarrers
         {
             public QueryStarrers(RepoKey key)
@@ -20,7 +18,7 @@ namespace GithubActors.Actors
                 Key = key;
             }
 
-            public RepoKey Key { get; private set; }
+            public RepoKey Key { get; }
         }
 
         /// <summary>
@@ -33,7 +31,7 @@ namespace GithubActors.Actors
                 Login = login;
             }
 
-            public string Login { get; private set; }
+            public string Login { get; }
         }
 
         public class StarredReposForUser
@@ -44,12 +42,10 @@ namespace GithubActors.Actors
                 Login = login;
             }
 
-            public string Login { get; private set; }
+            public string Login { get; }
 
-            public IEnumerable<Repository> Repos { get; private set; }
+            public IEnumerable<Repository> Repos { get; }
         }
-
-        #endregion
 
         private IGitHubClient _gitHubClient;
         private readonly Func<IGitHubClient> _gitHubClientFactory;

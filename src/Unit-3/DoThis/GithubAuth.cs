@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Akka.Actor;
 using GithubActors.Actors;
@@ -31,10 +24,8 @@ namespace GithubActors
 
         private void linkGhLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            var link = e.Link.LinkData as string;
-            if (link != null)
+            if (e.Link.LinkData is string link)
             {
-                //Send the URL to the operating system via windows shell
                 Process.Start(link);
             }
         }

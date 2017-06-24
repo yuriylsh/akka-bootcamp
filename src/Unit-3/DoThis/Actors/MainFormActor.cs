@@ -10,8 +10,6 @@ namespace GithubActors.Actors
     /// </summary>
     public class MainFormActor : ReceiveActor, IWithUnboundedStash
     {
-        #region Messages
-
         public class LaunchRepoResultsWindow
         {
             public LaunchRepoResultsWindow(RepoKey repo, IActorRef coordinator)
@@ -20,12 +18,10 @@ namespace GithubActors.Actors
                 Coordinator = coordinator;
             }
 
-            public RepoKey Repo { get; private set; }
+            public RepoKey Repo { get; }
 
-            public IActorRef Coordinator { get; private set; }
+            public IActorRef Coordinator { get; }
         }
-
-        #endregion
 
         private readonly Label _validationLabel;
 
