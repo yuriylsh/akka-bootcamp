@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Akka.Actor;
+using Akka.Routing;
 using Octokit;
 
 namespace GithubActors.Actors
@@ -12,47 +13,6 @@ namespace GithubActors.Actors
     /// </summary>
     public class GithubCoordinatorActor : ReceiveActor
     {
-        public class BeginJob
-        {
-            public BeginJob(RepoKey repo)
-            {
-                Repo = repo;
-            }
-
-            public RepoKey Repo { get; }
-        }
-
-        public class SubscribeToProgressUpdates
-        {
-            public SubscribeToProgressUpdates(IActorRef subscriber)
-            {
-                Subscriber = subscriber;
-            }
-
-            public IActorRef Subscriber { get; }
-        }
-
-        public class PublishUpdate
-        {
-            private PublishUpdate() { }
-            private static readonly PublishUpdate _instance = new PublishUpdate();
-
-            public static PublishUpdate Instance => _instance;
-        }
-
-        /// <summary>
-        /// Let the subscribers know we failed
-        /// </summary>
-        public class JobFailed
-        {
-            public JobFailed(RepoKey repo)
-            {
-                Repo = repo;
-            }
-
-            public RepoKey Repo { get; }
-        }
-
         private IActorRef _githubWorker;
 
         private RepoKey _currentRepo;
@@ -70,7 +30,9 @@ namespace GithubActors.Actors
 
         protected override void PreStart()
         {
-            _githubWorker = Context.ActorOf(Props.Create(() => new GithubWorkerActor(GithubClientFactory.GetClient)));
+            _githubWorker = Context.ActorOf(Props.Create(() => 
+                new GithubWorkerActor(GithubClientFactory.GetClient))
+                .WithRouter(new RoundRobinPool(10)));
         }
 
         private void Waiting()
@@ -185,6 +147,35 @@ namespace GithubActors.Actors
 
             //query failed, can't be retried, and it's a QueryStarrers operation - means individual operation failed
             Receive<RetryableQuery>(query => !query.CanRetry && query.Query is GithubWorkerActor.QueryStarrer, query => _githubProgressStats.IncrementFailures());
+        }
+
+        public class BeginJob
+        {
+            public RepoKey Repo { get; }
+
+            public BeginJob(RepoKey repo) => Repo = repo;
+        }
+
+        public class SubscribeToProgressUpdates
+        {
+            public IActorRef Subscriber { get; }
+            public SubscribeToProgressUpdates(IActorRef subscriber) => Subscriber = subscriber;
+        }
+
+        public class PublishUpdate
+        {
+            private PublishUpdate() { }
+
+            public static PublishUpdate Instance { get; } = new PublishUpdate();
+        }
+
+        /// <summary>
+        /// Let the subscribers know we failed
+        /// </summary>
+        public class JobFailed
+        {
+            public RepoKey Repo { get; }
+            public JobFailed(RepoKey repo) => Repo = repo;
         }
     }
 }
